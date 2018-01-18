@@ -1,10 +1,10 @@
 ## functions------------------------------------------------------------
-# 
+## NA's in a vector or factor are replaced with last non-NA values
+## If firstBack is TRUE, it will fill in leading NA's with the first
+## non-NA value. If FALSE, it will not change leading NA's.
 # from here: http://www.cookbook-r.com/Manipulating_data/Filling_in_NAs_with_last_non-NA_value/
 fillNAgaps <- function(x, firstBack=FALSE) {
-  ## NA's in a vector or factor are replaced with last non-NA values
-  ## If firstBack is TRUE, it will fill in leading NA's with the first
-  ## non-NA value. If FALSE, it will not change leading NA's.
+
   
   # If it's a factor, store the level labels and convert to integer
   lvls <- NULL
@@ -34,34 +34,34 @@ fillNAgaps <- function(x, firstBack=FALSE) {
   x
 }
 
-## working directory------------------------------------------------------------
+## working directory------------------------------------------------------------------------------------------
 setwd("G:/NeuAll/Project/ROU-MB")
 
-## read library------------------------------------------------------------
+## read library------------------------------------------------------------------------------------------
 library(xlsx)
 library(plyr)
 library(stringr)
 library(tidyr)
 
-## year 2014------------------------------------------------------------
+## year 2014------------------------------------------------------------------------------------------
 # read data 2014
-data2014_2 <- read.xlsx("data/bloodmeals-2014.xlsx", 1)
+data2014 <- read.xlsx("data/bloodmeals-2014.xlsx", 1)
+data2014_2 <- data2014[1:2891,]
 
-# delete samples without information
-#data2014_2 <- subset(data2014, !(data2014$Zusatz.bezeichnung == "k.A."))
-
-# built new data.frame
+# built new data.frame with relevant information
 data2014b <- data.frame(sample_id = as.character(data2014_2$Zusatz.bezeichnung),
                         site = as.character(fillNAgaps(data2014_2$Trapping.site)),
                         date = as.character(fillNAgaps(data2014_2$Date.of.collection)),
                         mosquito_species = as.character(data2014_2$Mosquitoe.species),
                         host = as.character(data2014_2$bewertet.als),stringsAsFactors=FALSE)
 
-adapt_2014 <- read.xlsx("data/adapt_2015.xlsx", 2)[c(1:30, 32:57),]
+# read excel file to adapt some of the host species names 
+adapt_2014 <- read.xlsx("data/adapt_2015.xlsx", 2)[1:57,]
 
+# identify samples by sample id and replace host species names 
 data2014b$host[c(match(adapt_2014$Zusatz.bezeichnung,data2014b$sample_id))] <- as.character(adapt_2014$Answer.Alex)
 
-
+# homogenize names of host species
 data2014b$species_revalue <- revalue(data2014b$host, c("Anas sp." = "Anas spp.",      
                                                        "Anopheles sp mit Kocher" = "mosquito DNA",              
                                                        "Anopheles sp." = "mosquito DNA",                         
@@ -83,18 +83,12 @@ data2014b$species_revalue <- revalue(data2014b$host, c("Anas sp." = "Anas spp.",
                                                        "sus scrofa" = "Sus scrofa",                         
                                                        "unauswertbar" = "negative"))          
 
-#dfdf <- data2014_full %>% gather(species, specimens, Culex.modestus:Cx..spec)
-#dfdf2 <- subset(dfdf, specimens > 0)
-#splitted_sample_id2 <- str_split_fixed(dfdf2$Sample.ID, "C", 2)
-#dfdf2$Sample.ID = paste(splitted_sample_id2[,1], splitted_sample_id2[,2], sep = "-")
-#data2014b$sample_id2[!(data2014b$sample_id2 %in% dfdf2$Sample.ID)]
-
-#uuu <- merge(data2014b, dfdf2, by.x = "sample_id2",
-#             by.y = "Sample.ID")
 
 ## year 2015------------------------------------------------------------
+# read data 2015
 data2015 <- read.xlsx("data/bloodmeals-2015.xlsx", 1,stringsAsFactors=FALSE)
 
+# collapse mosquito species information from columns to 1 column
 dfdf <- data2015 %>% gather(species, specimens, Cx..spec:Mansonia.richiardii, na.rm = T)
 
 BBB1 <- c("Kocker: Nycticorax An 3+4 05.09.17 negativ",
@@ -144,6 +138,7 @@ data2015b$species_revalue <- revalue(data2015b$host, c(" Bos taurus" = "Bos taur
                                                        "negativ" = "negative"))          
 
 ## year 2016------------------------------------------------------------
+# read data 2016
 data2016 <- read.xlsx("data/bloodmeals-2016.xlsx", 1)
 data2016 <- data2016[1:497,]
 
@@ -228,9 +223,7 @@ LLL$species_revalue <- gdgdg[which(gdgdg[,2] > 0),2]
 ee3 <-rbind(ee2, LLL)
 
 # homogenize names of sites
-unique(ee3$site)
 ee3$site <- revalue(ee3$site, c("Dunarea veche" = "Dunarea Veche",
-                                "Dunarea Veche" = "Dunarea Veche",
                                 "Letea" = "Letea",
                                 "Sulina" = "Sulina",
                                 "L. Rosulet" = "Lake Rosulet",
