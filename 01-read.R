@@ -110,13 +110,13 @@ add_info_2015 <- subset(data2015_2, Bemerkungen.1 %in% add_info_2015_1 | Bemerku
 add_info_2015$Host. <- as.character(c("Bos taurus/Nycticorax nycticorax",
                                       "Bos taurus",
                                       "Felis catus",
-                                      "Sus scrofa/Bovine",
+                                      "Sus scrofa/Bovidae",
                                       "Homo sapiens/Ardea purpurea",
                                       "Bos taurus/Gallus gallus",
                                       "Bos taurus/Ardea purpurea",
                                       "Homo sapiens",
                                       "Bos taurus/Homo sapiens",
-                                      "Bat/Homo sapiens",
+                                      "Chiroptera/Homo sapiens",
                                       "Homo sapiens", "Homo sapiens", "Homo sapiens"))
 
 # built new data.frame with relevant information
@@ -127,7 +127,7 @@ data2015_3 <- data.frame(sample_id = as.character(data2015_2$Sample.ID),
                         host = as.character(data2015_2$Host.),stringsAsFactors=FALSE)
 
 # identify samples by sample id and replace host species names 
-data2015_3$host[c(match(CCC$Sample.ID,data2015_3$sample_id))] <- add_info_2015$Host.
+data2015_3$host[c(match(add_info_2015$Sample.ID,data2015_3$sample_id))] <- add_info_2015$Host.
 
 # homogenize names of host species
 data2015_3$host <- revalue(data2015_3$host, c(" Bos taurus" = "Bos taurus",           
@@ -170,6 +170,9 @@ data2016_3$host <- revalue(data2016_3$host, c("Anopheles sp." = "mosquito DNA",
 # rbind data from the 3 years
 data_all_years <- rbind(data2014_3, data2015_3, data2016_3)
 
+# finally homogenize names of host species
+data_all_years$host <- revalue(data_all_years$host, c("Anas phathyrhyncos" = "Anas platyrhynchos",
+                                                      "FCS contanimation" = "FCS contamination"))
 
 # homogenize names of mosquitoes
 data_all_years$mosquito_species <- revalue(data_all_years$mosquito_species, c("Ae. vexans" = "Aedes vexans",
@@ -242,17 +245,17 @@ dates_new_3 <- as.POSIXct(dates_new_2, format = "%d%m%Y")
 
 data_all_years$date <- dates_new_3
 
-# resolve the 
+write.table(data_all_years, "output/data_all_years.csv")
+
+# resolve the multiple-host samples and add as additional samples on the end of the table
 splitted_host_info <- str_split_fixed(data_all_years$host, "/", 2)
 data_all_years$host[which(splitted_host_info[,2] > 0)] <- splitted_host_info[which(splitted_host_info[,2] > 0),1]
 data_all_years_sub <- data_all_years[which(splitted_host_info[,2] > 0),]
 data_all_years_sub$host <- splitted_host_info[which(splitted_host_info[,2] > 0),2]
 data_all_years_2 <-rbind(data_all_years, data_all_years_sub)
 
-data_all_years_2$host <- revalue(data_all_years_2$host, c("Bat" = "Chiroptera",
-                                                          "Anas phathyrhyncos" = "Anas platyrhynchos",
-                                                          "Bovine" = "Bovidae",
-                                                          "FCS contanimation" = "FCS contamination"))
+write.table(data_all_years_2, "output/data_all_years_2.csv")
+
 
 
 # delete hosts
@@ -269,7 +272,7 @@ ee2 <- subset(ee, !(species_revalue %in% c("confusing results"
 "unidentified" 
 
 
-# delete sites
+# delete sites with gravid traps
 ee4 <- subset(ee3, !(ee3$site %in% c("GS", "CMZ")))
         
 
