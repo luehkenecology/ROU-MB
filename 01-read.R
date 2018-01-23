@@ -4,7 +4,7 @@
 ## non-NA value. If FALSE, it will not change leading NA's.
 # from here: http://www.cookbook-r.com/Manipulating_data/Filling_in_NAs_with_last_non-NA_value/
 fillNAgaps <- function(x, firstBack=FALSE) {
-
+  
   
   # If it's a factor, store the level labels and convert to integer
   lvls <- NULL
@@ -52,10 +52,10 @@ data2014_2 <- data2014[1:2891,]
 
 # built new data.frame only with relevant information
 data2014_3 <- data.frame(sample_id = as.character(data2014_2$Zusatz.bezeichnung),
-                        site = as.character(fillNAgaps(data2014_2$Trapping.site)),
-                        date = as.character(fillNAgaps(data2014_2$Date.of.collection)),
-                        mosquito_species = as.character(data2014_2$Mosquitoe.species),
-                        host = as.character(data2014_2$bewertet.als),stringsAsFactors=FALSE)
+                         site = as.character(fillNAgaps(data2014_2$Trapping.site)),
+                         date = as.character(fillNAgaps(data2014_2$Date.of.collection)),
+                         mosquito_species = as.character(data2014_2$Mosquitoe.species),
+                         host = as.character(data2014_2$bewertet.als),stringsAsFactors=FALSE)
 
 # read excel file to adapt some of the host species names 
 adapt_2014 <- read.xlsx("data/adapt_2015.xlsx", 2)[1:57,]
@@ -64,7 +64,7 @@ adapt_2014 <- read.xlsx("data/adapt_2015.xlsx", 2)[1:57,]
 data2014_3$host[c(match(adapt_2014$Zusatz.bezeichnung,data2014_3$sample_id))] <- as.character(adapt_2014$Answer.Alex)
 
 # homogenize names of host species
-data2014_3$host <- revalue(data2014_3$host, c("Anas sp." = "Anas spp.",      
+data2014_3$host <- revalue(data2014_3$host, c("Anas sp." = "Anatidae",      
                                               "Anopheles sp mit Kocher" = "mosquito DNA",              
                                               "Anopheles sp." = "mosquito DNA",                         
                                               "Anopheles sp. Mit Kocher" = "mosquito DNA",    
@@ -94,16 +94,16 @@ data2015_2 <- data2015 %>% gather(species, specimens, Cx..spec:Mansonia.richiard
 
 # identify samples with additional host information (e.g. multiple species)
 add_info_2015_1 <- c("Kocker: Nycticorax An 3+4 05.09.17 negativ",
-          "Bos taurus",
-          "Felis catus",
-          "Bovine with Burkett",
-          "Kocher =Ardea purpurea ",
-          "Gallus gallus m. Kocher An 3+4 05.09.17 negativ",
-          "Homo sapiens m. Kocher")
+                     "Bos taurus",
+                     "Felis catus",
+                     "Bovine with Burkett",
+                     "Kocher =Ardea purpurea ",
+                     "Gallus gallus m. Kocher An 3+4 05.09.17 negativ",
+                     "Homo sapiens m. Kocher")
 add_info_2015_2 <- c("Gallus gallus m. Kocher",
-          "Ardea purpurea am 22.11.17 (10157AA-411)",
-          "Homo sapiens m. Kocher",
-          "Homo sapiens am 22.11.17 (10157AA-411)") 
+                     "Ardea purpurea am 22.11.17 (10157AA-411)",
+                     "Homo sapiens m. Kocher",
+                     "Homo sapiens am 22.11.17 (10157AA-411)") 
 add_info_2015 <- subset(data2015_2, Bemerkungen.1 %in% add_info_2015_1 | Bemerkungen.2 %in% add_info_2015_2)
 
 # information to replace for the host of the samples with additional host information (e.g. multiple species)
@@ -121,10 +121,10 @@ add_info_2015$Host. <- as.character(c("Bos taurus/Nycticorax nycticorax",
 
 # built new data.frame with relevant information
 data2015_3 <- data.frame(sample_id = as.character(data2015_2$Sample.ID), 
-                        site = as.character(data2015_2$Trapping.site),
-                        date = as.character(data2015_2$Date.of.collection),
-                        mosquito_species = as.character(data2015_2$species),
-                        host = as.character(data2015_2$Host.),stringsAsFactors=FALSE)
+                         site = as.character(data2015_2$Trapping.site),
+                         date = as.character(data2015_2$Date.of.collection),
+                         mosquito_species = as.character(data2015_2$species),
+                         host = as.character(data2015_2$Host.),stringsAsFactors=FALSE)
 
 # identify samples by sample id and replace host species names 
 data2015_3$host[c(match(add_info_2015$Sample.ID,data2015_3$sample_id))] <- add_info_2015$Host.
@@ -155,20 +155,21 @@ data2016_2 <- data2016[1:497,]
 
 # built new data.frame with relevant information
 data2016_3 <- data.frame(sample_id = as.character(data2016_2$Zusatz.bezeichnung), 
-                        site = as.character(fillNAgaps(data2016_2$Trapping.site)),
-                        date = as.character(fillNAgaps(data2016_2$date_new)),
-                        mosquito_species = as.character(fillNAgaps(data2016_2$Mosquitoe.species)),
-                        host = as.character(data2016_2$bewertet.als))
+                         site = as.character(fillNAgaps(data2016_2$Trapping.site)),
+                         date = as.character(fillNAgaps(data2016_2$date_new)),
+                         mosquito_species = as.character(fillNAgaps(data2016_2$Mosquitoe.species)),
+                         host = as.character(data2016_2$bewertet.als))
 
 # homogenize names of host species
 data2016_3$host <- revalue(data2016_3$host, c("Anopheles sp." = "mosquito DNA",             
-                                            "Canis lupus familiaris" = "Canis lupus",     
-                                            "FCS contam. Bos taurus" = "FCS contanimation",   
-                                            "Pelophylax (Rana) ridibundus" = "Pelophylax ridibundus",                   
-                                            "Mustela nivalis " = "Mustela nivalis"))
+                                              "Canis lupus familiaris" = "Canis lupus",     
+                                              "FCS contam. Bos taurus" = "FCS contanimation",   
+                                              "Pelophylax (Rana) ridibundus" = "Pelophylax ridibundus",                   
+                                              "Mustela nivalis " = "Mustela nivalis"))
 
 # rbind data from the 3 years
 data_all_years <- rbind(data2014_3, data2015_3, data2016_3)
+
 
 # finally homogenize names of host species
 data_all_years$host <- revalue(data_all_years$host, c("Anas phathyrhyncos" = "Anas platyrhynchos",
@@ -255,34 +256,3 @@ data_all_years_sub$host <- splitted_host_info[which(splitted_host_info[,2] > 0),
 data_all_years_2 <-rbind(data_all_years, data_all_years_sub)
 
 write.table(data_all_years_2, "output/data_all_years_2.csv")
-
-
-
-# delete hosts
-ee2 <- subset(ee, !(species_revalue %in% c("confusing results"       
-                                           "missing"
-                                           "mosquito DNA"             
-                                           "negative" 
-                                           "FCS contanimation")))
-
-# delete taxa
-"Culicoides",
-"NA",
-"Simulidae",
-"unidentified" 
-
-
-# delete sites with gravid traps
-ee4 <- subset(ee3, !(ee3$site %in% c("GS", "CMZ")))
-        
-
-
-
-
-
-et <- ddply(na.omit(ee4), .(mosquito_species_new, site),
-      summarize,
-      n_species = length(unique(species_revalue)),
-      n_specimens = length(species_revalue),
-      length(unique(species_revalue))/length(species_revalue))
-sum(et[,4])
